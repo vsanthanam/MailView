@@ -32,7 +32,7 @@ public struct MailView: UIViewControllerRepresentable {
     // MARK: - Initializers
 
     public init(subject: String? = nil,
-                toRecipients: [String]? = [],
+                toRecipients: [String]? = nil,
                 messageBody: MessageBody = .empty,
                 onDismiss: ((Result<MFMailComposeResult, Error>) -> Void)? = nil) {
         self.subject = subject
@@ -57,6 +57,50 @@ public struct MailView: UIViewControllerRepresentable {
         public init(stringLiteral value: StringLiteralType) {
             self = .plain(value)
         }
+    }
+
+    public func subject(_ subject: String?) -> MailView {
+        var copy = self
+        copy.subject = subject
+        return copy
+    }
+
+    public func toRecipents(_ toRecipients: [String]?) -> MailView {
+        var copy = self
+        copy.toRecipients = toRecipients
+        return copy
+    }
+
+    public func messageBody(_ messageBody: MessageBody) -> MailView {
+        var copy = self
+        copy.messageBody = messageBody
+        return copy
+    }
+
+    public func plainMessageBody(_ body: String?) -> MailView {
+        var copy = self
+        if let body = body {
+            copy.messageBody = .plain(body)
+        } else {
+            copy.messageBody = .empty
+        }
+        return copy
+    }
+
+    public func richMessageBody(_ body: String?) -> MailView {
+        var copy = self
+        if let body = body {
+            copy.messageBody = .html(body)
+        } else {
+            copy.messageBody = .empty
+        }
+        return copy
+    }
+
+    public func onDismiss(_ action: ((Result<MFMailComposeResult, Error>) -> Void)?) -> MailView {
+        var copy = self
+        copy.onDismiss = action
+        return copy
     }
 
     // MARK: - UIViewControllerRepresentable
@@ -133,8 +177,8 @@ public struct MailView: UIViewControllerRepresentable {
     @Environment(\.dismiss)
     private var dismiss: DismissAction
 
-    private let subject: String?
-    private let toRecipients: [String]?
-    private let messageBody: MessageBody
-    private let onDismiss: ((Result<MFMailComposeResult, Error>) -> Void)?
+    private var subject: String?
+    private var toRecipients: [String]?
+    private var messageBody: MessageBody
+    private var onDismiss: ((Result<MFMailComposeResult, Error>) -> Void)?
 }
