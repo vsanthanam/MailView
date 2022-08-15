@@ -27,6 +27,22 @@ import MessageUI
 import SwiftUI
 import UIKit
 
+/// A wrapper around `MFMailComposeViewController` for use in SwiftUI
+///
+/// ## Topics
+///
+/// ### Initializers
+///
+/// - ``init(subject:toRecipients:messageBody:onDismiss:)``
+///
+/// ### Modifiers
+///
+/// - ``subject(_:)``
+/// - ``toRecipents(_:)``
+/// - ``messageBody(_:)``
+/// - ``plainMessageBody(_:)``
+/// - ``richMessageBody(_:)``
+/// - ``onDismiss(_:)``
 public struct MailView: UIViewControllerRepresentable {
 
     // MARK: - Initializers
@@ -181,4 +197,29 @@ public struct MailView: UIViewControllerRepresentable {
     private var toRecipients: [String]?
     private var messageBody: MessageBody
     private var onDismiss: ((Result<MFMailComposeResult, Error>) -> Void)?
+}
+
+public extension View {
+
+    /// Present a `MailView`
+    /// - Parameters:
+    ///   - isPresented: A binding which determines whether or not the view is presented
+    ///   - mailView: A closure used to build the presented view
+    /// - Returns: The modified view
+    func mailView(isPresented: Binding<Bool>,
+                  mailView: @escaping () -> MailView) -> some View {
+        sheet(isPresented: isPresented,
+              content: { mailView() })
+    }
+
+    /// Present a `MailView`
+    /// - Parameters:
+    ///   - item: Binding which determines whether or not the view is presented
+    ///   - mailView: A closure used to build the presented view
+    /// - Returns: The modified view
+    func mailView<T>(item: Binding<T?>,
+                     mailView: @escaping (T) -> MailView) -> some View where T: Identifiable {
+        sheet(item: item,
+              content: { item in mailView(item) })
+    }
 }
